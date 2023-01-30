@@ -28,8 +28,8 @@ app.add_middleware(
 
 @app.post("/github/repository/webhook/{}/".format(config.GITHUB_WEBHOOK_SECRET))
 def receive_github_repository_webhook(payload: PushWebhookPayload):
-    message = "New push in repository <a href='{}'>{}</a>".format(
-        payload.repository.html_url, escape_html(payload.repository.full_name)
+    message = "New push in repository <a href='{}'>{}</a> ({})".format(
+        payload.repository.html_url, escape_html(payload.repository.full_name), payload.ref
     )
 
     if payload.sender is not None:
@@ -38,25 +38,25 @@ def receive_github_repository_webhook(payload: PushWebhookPayload):
         )
 
     if len(payload.commits) > 0:
-        message += "\n<b>Commits:</b>"
+        message += "\n\n<b>Commits:</b>"
         for commit in payload.commits:
-            message += "\n<a href='{}'>{}</a>".format(
+            message += "\n\n<a href='{}'>{}</a>".format(
                 commit.url, escape_html(commit.id)
             )
-            message += "\n  <i>Message:</i> {}".format(commit.message)
+            message += "\n<b>{}</b>".format(commit.message)
 
             if len(commit.added) > 0:
-                message += "\n  <i>Added:</i> {}".format(
+                message += "\n<i>Added:</i> {}".format(
                     escape_html(", ".join(commit.added))
                 )
 
             if len(commit.removed) > 0:
-                message += "\n  <i>Removed:</i> {}".format(
+                message += "\n<i>Removed:</i> {}".format(
                     escape_html(", ".join(commit.removed))
                 )
 
             if len(commit.modified) > 0:
-                message += "\n  <i>Modified:</i> {}".format(
+                message += "\n<i>Modified:</i> {}".format(
                     escape_html(", ".join(commit.modified))
                 )
 
