@@ -28,7 +28,7 @@ app.add_middleware(
 
 @app.post("/github/repository/webhook/{}/".format(config.GITHUB_WEBHOOK_SECRET))
 def receive_github_repository_webhook(payload: PushWebhookPayload):
-    message = "New push in repository <a href='{}'>{}</a> ({})".format(
+    message = "New push in repository <a href='{}'>{}</a> <b>({})</b>".format(
         payload.repository.html_url, escape_html(payload.repository.full_name), payload.ref
     )
 
@@ -38,12 +38,10 @@ def receive_github_repository_webhook(payload: PushWebhookPayload):
         )
 
     if len(payload.commits) > 0:
-        message += "\n\n<b>Commits:</b>"
         for commit in payload.commits:
-            message += "\n\n<a href='{}'>{}</a>".format(
-                commit.url, escape_html(commit.id)
+            message += "\n\n{} (<a href='{}'>{}</a>)".format(
+                commit.message, commit.url, escape_html(commit.id)
             )
-            message += "\n<b>{}</b>".format(commit.message)
 
             if len(commit.added) > 0:
                 message += "\n<i>Added:</i> {}".format(
